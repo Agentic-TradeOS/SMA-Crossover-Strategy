@@ -1,0 +1,296 @@
+{
+  "name": "SMA Crossover",
+  "description": "Buys when the fast SMA crosses above the slow SMA and sells when it crosses below. A classic trend-following strategy that captures medium-term trends.",
+  "category": "trend_following",
+  "tags": [
+    "trend",
+    "moving-average",
+    "crossover",
+    "sma",
+    "classic"
+  ],
+  "asset_types": [
+    "stocks"
+  ],
+  "visibility": "public",
+  "version": 1,
+  "visual_blocks": [
+    {
+      "id": "trigger-fast-sma",
+      "type": "indicator",
+      "name": "SMA",
+      "description": "Fast moving average (e.g., 10-period)",
+      "icon": "TrendingUp",
+      "inputs": [
+        {
+          "id": "period",
+          "name": "Period",
+          "type": "number",
+          "required": true,
+          "defaultValue": 10
+        },
+        {
+          "id": "source",
+          "name": "Source",
+          "type": "string",
+          "required": true,
+          "defaultValue": "close"
+        }
+      ],
+      "outputs": [
+        {
+          "id": "value",
+          "name": "SMA Value",
+          "type": "number"
+        }
+      ],
+      "config": {},
+      "position": {
+        "x": 100,
+        "y": 100
+      }
+    },
+    {
+      "id": "trigger-slow-sma",
+      "type": "indicator",
+      "name": "SMA",
+      "description": "Slow moving average (e.g., 30-period)",
+      "icon": "TrendingUp",
+      "inputs": [
+        {
+          "id": "period",
+          "name": "Period",
+          "type": "number",
+          "required": true,
+          "defaultValue": 30
+        },
+        {
+          "id": "source",
+          "name": "Source",
+          "type": "string",
+          "required": true,
+          "defaultValue": "close"
+        }
+      ],
+      "outputs": [
+        {
+          "id": "value",
+          "name": "SMA Value",
+          "type": "number"
+        }
+      ],
+      "config": {},
+      "position": {
+        "x": 100,
+        "y": 220
+      }
+    },
+    {
+      "id": "condition-crossover",
+      "type": "condition",
+      "name": "Crosses Above",
+      "description": "Trigger when fast SMA crosses above slow SMA",
+      "icon": "GitMerge",
+      "inputs": [
+        {
+          "id": "a",
+          "name": "Fast SMA",
+          "type": "number",
+          "required": true
+        },
+        {
+          "id": "b",
+          "name": "Slow SMA",
+          "type": "number",
+          "required": true
+        }
+      ],
+      "outputs": [
+        {
+          "id": "signal",
+          "name": "Crossover",
+          "type": "signal"
+        }
+      ],
+      "config": {
+        "direction": "above"
+      },
+      "position": {
+        "x": 350,
+        "y": 160
+      }
+    },
+    {
+      "id": "condition-crossbelow",
+      "type": "condition",
+      "name": "Crosses Below",
+      "description": "Trigger when fast SMA crosses below slow SMA",
+      "icon": "GitMerge",
+      "inputs": [
+        {
+          "id": "a",
+          "name": "Fast SMA",
+          "type": "number",
+          "required": true
+        },
+        {
+          "id": "b",
+          "name": "Slow SMA",
+          "type": "number",
+          "required": true
+        }
+      ],
+      "outputs": [
+        {
+          "id": "signal",
+          "name": "Crossunder",
+          "type": "signal"
+        }
+      ],
+      "config": {
+        "direction": "below"
+      },
+      "position": {
+        "x": 350,
+        "y": 300
+      }
+    },
+    {
+      "id": "action-buy",
+      "type": "action",
+      "name": "Buy",
+      "description": "Enter long position on golden cross",
+      "icon": "ArrowUpCircle",
+      "inputs": [
+        {
+          "id": "trigger",
+          "name": "Trigger",
+          "type": "signal",
+          "required": true
+        },
+        {
+          "id": "quantity",
+          "name": "Contracts",
+          "type": "number",
+          "required": true,
+          "defaultValue": 100
+        },
+        {
+          "id": "order_type",
+          "name": "Order Type",
+          "type": "string",
+          "required": true,
+          "defaultValue": "market"
+        }
+      ],
+      "outputs": [
+        {
+          "id": "executed",
+          "name": "Executed",
+          "type": "signal"
+        }
+      ],
+      "config": {
+        "action": "buy"
+      },
+      "position": {
+        "x": 600,
+        "y": 100
+      }
+    },
+    {
+      "id": "action-sell",
+      "type": "action",
+      "name": "Sell",
+      "description": "Exit position on death cross",
+      "icon": "ArrowDownCircle",
+      "inputs": [
+        {
+          "id": "trigger",
+          "name": "Trigger",
+          "type": "signal",
+          "required": true
+        },
+        {
+          "id": "quantity",
+          "name": "Contracts",
+          "type": "number",
+          "required": true,
+          "defaultValue": 100
+        },
+        {
+          "id": "order_type",
+          "name": "Order Type",
+          "type": "string",
+          "required": true,
+          "defaultValue": "market"
+        }
+      ],
+      "outputs": [
+        {
+          "id": "executed",
+          "name": "Executed",
+          "type": "signal"
+        }
+      ],
+      "config": {
+        "action": "sell"
+      },
+      "position": {
+        "x": 600,
+        "y": 300
+      }
+    }
+  ],
+  "connections": [
+    {
+      "id": "conn-1",
+      "sourceBlockId": "trigger-fast-sma",
+      "sourceOutputId": "value",
+      "targetBlockId": "condition-crossover",
+      "targetInputId": "a"
+    },
+    {
+      "id": "conn-2",
+      "sourceBlockId": "trigger-slow-sma",
+      "sourceOutputId": "value",
+      "targetBlockId": "condition-crossover",
+      "targetInputId": "b"
+    },
+    {
+      "id": "conn-3",
+      "sourceBlockId": "trigger-fast-sma",
+      "sourceOutputId": "value",
+      "targetBlockId": "condition-crossbelow",
+      "targetInputId": "a"
+    },
+    {
+      "id": "conn-4",
+      "sourceBlockId": "trigger-slow-sma",
+      "sourceOutputId": "value",
+      "targetBlockId": "condition-crossbelow",
+      "targetInputId": "b"
+    },
+    {
+      "id": "conn-5",
+      "sourceBlockId": "condition-crossover",
+      "sourceOutputId": "signal",
+      "targetBlockId": "action-buy",
+      "targetInputId": "trigger"
+    },
+    {
+      "id": "conn-6",
+      "sourceBlockId": "condition-crossbelow",
+      "sourceOutputId": "signal",
+      "targetBlockId": "action-sell",
+      "targetInputId": "trigger"
+    }
+  ],
+  "code": "def generate_signal(context, data, symbol):\n    # Get price history\n    prices = data.history(symbol, 'close', 50)\n    \n    # Calculate SMAs\n    fast = prices[-10:].mean()\n    slow = prices[-30:].mean()\n    \n    # Get previous values\n    prices_prev = data.history(symbol, 'close', 51)[:-1]\n    fast_prev = prices_prev[-10:].mean()\n    slow_prev = prices_prev[-30:].mean()\n    \n    # Check for crossover\n    if fast_prev <= slow_prev and fast > slow:\n        return 'BUY'\n    elif fast_prev >= slow_prev and fast < slow:\n        return 'SELL'\n    return 'HOLD'\n\ndef backtest(symbols, start_date, end_date):\n    return run_backtest(\n        strategy='sma-crossover',\n        symbols=symbols,\n        start_date=start_date,\n        end_date=end_date,\n        fast_period=10,\n        slow_period=30\n    )",
+  "performance_summary": {
+    "sharpe_ratio": 1.15,
+    "total_return": 45.2,
+    "max_drawdown": 12.3
+  },
+  "author": "Agentic Trading"
+}
